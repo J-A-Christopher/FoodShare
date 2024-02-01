@@ -1,4 +1,6 @@
 const Food = require("../models/food_model");
+const { Op } = require('sequelize');
+
 
 exports.postAddFood = (req, res, next) => {
   const name = req.body.name;
@@ -24,3 +26,30 @@ exports.postAddFood = (req, res, next) => {
       console.log(err);
     });
 };
+
+exports.searchFood = async (req, res, next) => {
+  try {
+    const { q: query } = req.query;
+    if (!query) {
+      return res.status(400).json({ error: 'Missing search query parameter' });
+    }
+    const searchCriteria = {
+      [Op.or]: [
+        { name: { [Op.like]: `%${query}%` } },
+      ],
+  
+    }
+  
+    const foods = await Food.findAll({
+      where: searchCriteria,
+      //include: [{ model: User, attributes: ['id', 'username'] }],
+    });
+    res.json({ foods });
+  } catch (error) {
+    console.log(`Error during search ${error}`);
+    res.status(500).json({ error: 'Internal Server Error' });
+    
+  }
+ 
+  
+}
