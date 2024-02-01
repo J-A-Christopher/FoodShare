@@ -6,6 +6,7 @@ exports.postAddFood = (req, res, next) => {
   const timeCooked = req.body.timeCooked;
   const address = req.body.address;
   const utensilsRequired = req.body.utensilsRequired;
+  const status = req.body.status
   const userId = req.user.id;
   Food.create({
     name: name,
@@ -14,6 +15,7 @@ exports.postAddFood = (req, res, next) => {
     address: address,
     utensilsRequired: utensilsRequired,
     userId: userId,
+    status: status
   })
     .then((result) => {
       res.status(200).send("Food Created Successfully");

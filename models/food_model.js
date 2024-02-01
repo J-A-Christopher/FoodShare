@@ -29,6 +29,11 @@ const Food = sequelize.define('food', {
         type: Sequelize.STRING,
         allowNull: false,
     },
+    status: {
+        type: Sequelize.STRING,
+        defaultValue: 'unprocessed',
+        allowNull: false,
+    },
     
 });
 
