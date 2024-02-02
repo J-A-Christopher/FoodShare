@@ -45,3 +45,45 @@ exports.orderController = async (req, res, next) => {
     res.status(500).send('Internal Server Error');
   }
 };
+
+exports.processOrder = async (req, res, next) => {
+  const userId = req.user.id;
+  const status = req.body.status;
+  const orderId = req.body.orderId;
+  const orderModel = await Order.findByPk(orderId);
+  if (!orderModel) {
+   return res.status(404).json({ message: 'Order not found' });
+  }
+
+  if (orderModel.recipeintId !== userId) {
+   return res.status(401).json({ message: 'UnAuthorized' });
+  }
+  
+  if (orderModel.status !== 'requested') {
+   return res.status(422).json({ message: "This order has already been processed" });
+  }
+
+  if (status === "approved") {
+    orderModel.status = status;
+    await orderModel.update({ status });
+    
+    ///Todo SEnd Push Notification(Order Accepted)
+
+    return res.status(201).json({ message: 'Order successfully processed' });
+
+  }
+
+  if (status === "rejected") {
+    await orderModel.update({ status });
+    const foodId = orderModel.foodId;
+    const foodModel = await Food.findByPk(foodId);
+    const foodStatus = foodModel.status = 'unprocessed';
+    await foodModel.update({ status: foodStatus });
+
+    ///Todo Send Push Notification (Order rejected)
+
+    return res.status(200).json({ message: 'Order rejected' });
+    
+  }
+  
+}

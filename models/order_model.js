@@ -23,7 +23,15 @@ const Order = sequelize.define("order", {
   senderId: {
     type: Sequelize.INTEGER,
     allowNull: false,
+  },
+
+  status: {
+    type: Sequelize.STRING,
+    defaultValue:'requested',
+    allowNull: false,
   }
+
+
 
   
 });
