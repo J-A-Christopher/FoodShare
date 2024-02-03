@@ -1,7 +1,7 @@
 const User = require("../models/user_model");
 
 exports.userBoard = (req, res) => {
-  res.status(200).send("You are a logged in user");
+  res.status(200).json({ message:"You are a logged in user"});
 };
 
 exports.getUserData = async (req, res) => {
@@ -17,8 +17,8 @@ exports.getUserData = async (req, res) => {
       return res.status(404).send("User not found");
     }
 
-    res.send({ userModel });
+    res.json({ userModel });
   } catch (error) {
-    res.status(500).send("Internal server error");
+    res.status(500).json({message: "Internal server error"});
   }
 };

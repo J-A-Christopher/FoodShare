@@ -7,15 +7,14 @@ verifyToken = (req, res, next) => {
     console.log(token);
 
     if (!token) {
-        return res.status(403).send({ message: "No token provided" });
+        return res.status(403).json({ message: "No token provided" });
     }
 
-    jwt.verify(token, config.secret, (err, user) => {
+    jwt.verify(token, config.secret, (err, decodedToken) => {
         if (err) {
-            return res.status(401).send({ message: "Unauthorized !" });
+            return res.status(401).json({ message: "Unauthorized !" });
         }
-        //req.userId = decoded.id;
-        req.user = user;
+        req.user = decodedToken.user;
         next();
         
     });
