@@ -14,6 +14,10 @@ const User = sequelize.define("user", {
     type: Sequelize.STRING,
     allowNull: false,
   },
+  profilePicture: {
+    type: Sequelize.TEXT,
+    allowNull: false,
+  },
 
   lastname: {
     type: Sequelize.STRING,

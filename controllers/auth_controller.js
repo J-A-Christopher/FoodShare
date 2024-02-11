@@ -9,6 +9,7 @@ var bcrypt = require("bcryptjs");
 exports.signUp = (req, res) => {
   User.create({
     firstname: req.body.firstname,
+    profilePicture: req.body.profilePicture,
     lastname: req.body.lastname,
     username: req.body.username,
     email: req.body.email,
@@ -51,6 +52,7 @@ exports.signIn = (req, res) => {
       const payload = {
         id: user.id,
         pushToken: user.pushToken,
+        profilePicture: user.profilePicture,
         firstname: user.firstname,
         lastname: user.lastname,
         username: user.username,

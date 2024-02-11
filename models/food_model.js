@@ -9,7 +9,23 @@ const Food = sequelize.define('food', {
         allowNull: false,
         primaryKey: true,
     },
+    imageUrl: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+    },
     name: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    dateOfPreparation: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    timeOfPreparation: {
+        type: Sequelize.STRING,
+        allowNull: false,
+    },
+    timeRequiredForDelivery: {
         type: Sequelize.STRING,
         allowNull: false,
     },
@@ -17,7 +33,7 @@ const Food = sequelize.define('food', {
         type: Sequelize.INTEGER,
         allowNull: false,
     },
-    timeCooked: {
+    address: {
         type: Sequelize.STRING,
         allowNull: false,
     },

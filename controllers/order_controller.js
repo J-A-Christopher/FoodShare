@@ -1,18 +1,8 @@
-const { initializeApp, applicationDefault } = require("firebase-admin/app");
 const Food = require("../models/food_model");
 const Order = require("../models/order_model");
+const { sendPushNOtification } = require("../util/notification");
 
-const admin = require("firebase-admin");
-const serviceAccount = require("../usiiname-push-notification-firebase-adminsdk-vkl0u-6dc35bd018.json");
 const User = require("../models/user_model");
-
-process.env.GOOGLE_APPLICATION_CREDENTIALS;
-
-initializeApp({
-  projectId: "usiiname-push-notification",
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: "https://usiiname-push-notification.firebaseio.com",
-});
 
 exports.orderController = async (req, res, next) => {
   const userId = req.user.id;
@@ -52,8 +42,25 @@ exports.orderController = async (req, res, next) => {
       senderId: userId,
       userId: userId,
     });
+    const foodObject = await Food.findByPk(foodId);
+    const orderId = order.id;
+    const sender = await User.findByPk(order.userId);
+    const userFound = await User.findByPk(order.recipeintId);
+    const pushTokenForRecepient = userFound.pushToken;
+
+    const data = {
+      foodName: foodObject.name,
+      imageUrl: foodObject.imageUrl,
+      orderId: `${orderId}`,
+      name: sender.firstname,
+    };
 
     await food.update({ orderId: order.id, status: "processed" });
+    await sendPushNOtification(
+      pushTokenForRecepient,
+      "You have a new order request",
+      data
+    );
 
     res.json({ message: "Food successfully processed, and order created!" });
   } catch (error) {
@@ -67,6 +74,7 @@ exports.processOrder = async (req, res, next) => {
   const status = req.body.status;
   const orderId = req.body.orderId;
   const orderModel = await Order.findByPk(orderId);
+  console.log(userId);
   if (!orderModel) {
     return res.status(404).json({ message: "Order not found" });
   }
@@ -81,35 +89,22 @@ exports.processOrder = async (req, res, next) => {
       .json({ message: "This order has already been processed" });
   }
 
+  const data = {
+    order: orderModel.status,
+  };
   if (status === "approved") {
     orderModel.status = status;
     await orderModel.update({ status });
 
     ///Todo SEnd Push Notification(Order Accepted)
     const user = await User.findByPk(userId);
-    const pushTokenforUser = user.pushToken;
-    const registrationToken = pushTokenforUser;
-    const message = {
-      notification: {
-        title: "Order Acception",
-        body: "Congratulations !.. your order has been accepted.",
-      },
-      token: registrationToken,
-    };
-    admin
-      .messaging()
-      .send(message)
-      .then((response) => {
-        // res.status(200).json({
-        //   message: "Successfully sent message",
-        //   token: registrationToken
-        // });
-        console.log("Successfully sent message:", response);
-      })
-      .catch((error) => {
-        // res.status(400).json({message: "Error sending message ", error})
-        console.log("Error sending message:", error);
-      });
+    const pushTokenForUser = user.pushToken;
+
+    await sendPushNOtification(
+      pushTokenForUser,
+      "Order approved successfully",
+      data
+    );
 
     return res.status(201).json({ message: "Order successfully processed" });
   }
@@ -123,14 +118,10 @@ exports.processOrder = async (req, res, next) => {
 
     ///Todo Send Push Notification (Order rejected)
     const user = await User.findByPk(userId);
-    const pushTokenforUser = user.pushToken;
-
-    await sendPushNotification(
-      pushTokenforUser,
-      "Order rejected.",
-      "Try again next time"
-    );
+    const pushTokenForUser = user.pushToken;
+    await sendPushNOtification(pushTokenForUser, "Order rejected");
 
     return res.status(200).json({ message: "Order rejected" });
   }
+  return res.status(404).json({ message: "Bad Request" });
 };

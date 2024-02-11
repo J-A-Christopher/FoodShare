@@ -7,4 +7,7 @@ router.post('/api/add-food', [authJwt.verifyToken],foodController.postAddFood);
 
 router.get('/api/search', [authJwt.verifyToken],foodController.searchFood);
 
+router.post('/api/live-donations', [authJwt.verifyToken], foodController.liveDonations);
+
+router.post('/api/user-donations', [authJwt.verifyToken], foodController.userDonations);
 module.exports = router;
