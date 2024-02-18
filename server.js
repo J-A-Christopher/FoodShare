@@ -9,15 +9,15 @@ const Order = require("./models/order_model");
 const foodRoute = require("./routes/food_routes");
 const orderRoute = require("./routes/order_routes");
 const app = express();
-const admin = require('firebase-admin')
-const { ServiceAccount } = require('firebase-admin')
-const account = require('./usiiname-push-notification-firebase-adminsdk-vkl0u-6dc35bd018.json')
+const admin = require("firebase-admin");
+const { ServiceAccount } = require("firebase-admin");
+const account = require("./usiiname-push-notification-firebase-adminsdk-vkl0u-6dc35bd018.json");
 
-
-admin.initializeApp({ credential: admin.credential.cert(account)})
+admin.initializeApp({ credential: admin.credential.cert(account) });
 
 var corsOptions = {
-  origin: "http://localhost:8081",
+  //origin: "http://localhost:8081",
+  origin: "https://food-share-nine.vercel.app",
 };
 
 app.use(cors(corsOptions));
