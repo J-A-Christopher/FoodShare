@@ -17,7 +17,7 @@ admin.initializeApp({ credential: admin.credential.cert(account) });
 
 var corsOptions = {
   //origin: "http://localhost:8081",
-  origin: "https://food-share-nine.vercel.app",
+  origin: "https://foodshare.onrender.com",
 };
 
 app.use(cors(corsOptions));
