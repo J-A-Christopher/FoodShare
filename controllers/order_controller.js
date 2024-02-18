@@ -74,7 +74,8 @@ exports.processOrder = async (req, res, next) => {
   const status = req.body.status;
   const orderId = req.body.orderId;
   const orderModel = await Order.findByPk(orderId);
-  console.log(userId);
+
+  console.log(req.body)
   if (!orderModel) {
     return res.status(404).json({ message: "Order not found" });
   }
@@ -99,14 +100,17 @@ exports.processOrder = async (req, res, next) => {
     ///Todo SEnd Push Notification(Order Accepted)
     const user = await User.findByPk(userId);
     const pushTokenForUser = user.pushToken;
+    const orderRecipientId = orderModel.userId;
+    const orderRecipient = await User.findByPk(orderRecipientId);
+    const pushTokenForRecipient = orderRecipient.pushToken;
 
     await sendPushNOtification(
-      pushTokenForUser,
-      "Order approved successfully",
+      pushTokenForRecipient,
+      "Order approved; You can now pick up your order.",
       data
     );
 
-    return res.status(201).json({ message: "Order successfully processed" });
+    return res.status(201).json({ message: "Order approved; You can now pick up your order." });
   }
 
   if (status === "rejected") {
@@ -117,9 +121,15 @@ exports.processOrder = async (req, res, next) => {
     await foodModel.update({ status: foodStatus });
 
     ///Todo Send Push Notification (Order rejected)
-    const user = await User.findByPk(userId);
-    const pushTokenForUser = user.pushToken;
-    await sendPushNOtification(pushTokenForUser, "Order rejected");
+    const orderRecipientId = orderModel.userId;
+    const orderRecipient = await User.findByPk(orderRecipientId);
+    const pushTokenForRecipient = orderRecipient.pushToken;
+
+    await sendPushNOtification(
+      pushTokenForRecipient,
+      "Order rejected.",
+      data
+    );
 
     return res.status(200).json({ message: "Order rejected" });
   }
